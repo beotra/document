@@ -1,0 +1,54 @@
+1.Requirements
+pip install paddlepaddle-gpu
+cd PaddleOCR
+pip install -r requirements.txt
+pip install -r ppstructure/kie/requirements.txt
+pip install paddleocr -U
+cd PaddleDetection
+pip install -r requirements.txt
+
+2.pretrained model 
+Text Detection:       ch_PP-OCRv3_det_infer
+Text Recognition:     ch_PP-OCRv3_rec_infer
+Table Recognition:    ch_ppstructure_mobile_v2.0_SLANet_infer
+Layout Analysis:      picodet_lcnet_x1_0_fgd_layout_infer
+RE:                   re_vi_layoutxlm_xfund_pretrained
+SER:                  ser_vi_layoutxlm_xfund_pretrained
+
+3.Layout Analysis 
+cd PaddleDetection 
+python3 tools/infer.py -c configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml  -o weights='/workspace/huongdtt/SGBEyes/code_tra/weight/picodet_lcnet_x1_0_fgd_layout.pdparams' --infer_img='docs/images/layout.jpg' --output_dir=output_dir/ --draw_threshold=0.5
+
+4.Table Recognition 
+cd PaddleOCR/ppstructure 
+python table/predict_table.py \
+    --det_model_dir=../../inference/ch_PP-OCRv3_det_infer \
+    --rec_model_dir=../../inference/ch_PP-OCRv3_rec_infer  \
+    --table_model_dir=../../inference/ch_ppstructure_mobile_v2.0_SLANet_infer \
+    --rec_char_dict_path=../ppocr/utils/ppocr_keys_v1.txt \
+    --table_char_dict_path=../ppocr/utils/dict/table_structure_dict_ch.txt \
+    --image_dir=docs/table/table.jpg \
+    --output=../output/table
+
+5.Key Information Extraction(KIE) 
+a.Text detection + text recognition + semantic entity recognition (SER)
+cd PaddleOCR/ppstructure 
+python3 kie/predict_kie_token_ser.py \
+  --kie_algorithm=LayoutXLM \
+  --ser_model_dir=../../inference/ser_vi_layoutxlm_xfund_infer \
+  --image_dir=./docs/kie/input/zh_val_42.jpg \
+  --ser_dict_path=../train_data/XFUND/class_list_xfun.txt \
+  --vis_font_path=../doc/fonts/simfang.ttf \
+  --ocr_order_method="tb-yx"
+
+b.Text detection + text recognition + semantic entity recognition (SER) + relationship extraction (RE)
+cd PaddleOCR/ppstructure 
+python3 kie/predict_kie_token_ser_re.py \
+  --kie_algorithm=LayoutXLM \
+  --re_model_dir=../../inference/re_vi_layoutxlm_xfund_infer \
+  --ser_model_dir=../../inference/ser_vi_layoutxlm_xfund_infer \
+  --use_visual_backbone=False \
+  --image_dir=./docs/kie/input/zh_val_42.jpg \
+  --ser_dict_path=../train_data/XFUND/class_list_xfun.txt \
+  --vis_font_path=../doc/fonts/simfang.ttf \
+  --ocr_order_method="tb-yx"
