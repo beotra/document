@@ -6,8 +6,9 @@ pip install -r ppstructure/kie/requirements.txt
 pip install paddleocr -U
 cd PaddleDetection
 pip install -r requirements.txt
+python setup.py install 
 
-2.pretrained model 
+2.pretrained_model 
 Text Detection:       ch_PP-OCRv3_det_infer
 Text Recognition:     ch_PP-OCRv3_rec_infer
 Table Recognition:    ch_ppstructure_mobile_v2.0_SLANet_infer
@@ -15,9 +16,30 @@ Layout Analysis:      picodet_lcnet_x1_0_fgd_layout_infer
 RE:                   re_vi_layoutxlm_xfund_pretrained
 SER:                  ser_vi_layoutxlm_xfund_pretrained
 
+3.weight
+Layout Analyis:       picodet_lcnet_x1_0_layout
+
 3.Layout Analysis 
+#di chuyển tới thư mục 
 cd PaddleDetection 
-python3 tools/infer.py -c configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml  -o weights='/workspace/huongdtt/SGBEyes/code_tra/weight/picodet_lcnet_x1_0_fgd_layout.pdparams' --infer_img='docs/images/layout.jpg' --output_dir=output_dir/ --draw_threshold=0.5
+#dùng weight tự train 
+python3 tools/infer.py \
+    -c configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml \
+    -o weights=../weight/picodet_lcnet_x1_0_layout/best_model.pdparams \
+    --infer_img='docs/images/layout.jpg' \
+    --output_dir=output_dir/ \
+    --draw_threshold=0.5
+    
+#dùng pretrained_model 
+python3 tools/infer.py \
+    -c configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml \
+    -o weights=../pretrained_model/picodet_lcnet_x1_0_fgd_layout.pdparams \
+    --infer_img='docs/images/layout.jpg' \
+    --output_dir=output_dir/ \
+    --draw_threshold=0.5
+#dùng hàm để gọi 
+from PaddleDetection.tools.infer import layout_analysis_function
+ layout_analysis_function('PaddleDetection/configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml','weight/picodet_lcnet_x1_0_layout/best_model.pdparams','PaddleDetection/docs/images/layout.jpg')
 
 4.Table Recognition 
 cd PaddleOCR/ppstructure 
