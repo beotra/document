@@ -7,6 +7,7 @@ pip install paddleocr -U
 cd PaddleDetection
 pip install -r requirements.txt
 python setup.py install 
+pip install paddlenlp
 
 2.pretrained_model 
 Text Detection:       ch_PP-OCRv3_det_infer
@@ -39,7 +40,8 @@ python3 tools/infer.py \
     --draw_threshold=0.5
 #dùng hàm để gọi 
 from PaddleDetection.tools.infer import layout_analysis_function
- layout_analysis_function('PaddleDetection/configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml','weight/picodet_lcnet_x1_0_layout/best_model.pdparams','PaddleDetection/docs/images/layout.jpg')
+results=layout_analysis_function('PaddleDetection/configs/picodet/legacy_model/application/layout_analysis/picodet_lcnet_x1_0_layout.yml','weight/picodet_lcnet_x1_0_layout/best_model.pdparams','PaddleDetection/docs/images/layout.jpg')
+print(results)
 
 4.Table Recognition 
 cd PaddleOCR/ppstructure 
@@ -51,15 +53,21 @@ python table/predict_table.py \
     --table_char_dict_path=../ppocr/utils/dict/table_structure_dict_ch.txt \
     --image_dir=docs/table/table.jpg \
     --output=../output/table
+#dùng hàm để gọi 
+from PaddleOCR.ppstructure.table.predict_table import predict_table_function
+results=predict_table_function("PaddleOCR/ppstructure/inference/ch_PP-OCRv3_det_infer","PaddleOCR/ppstructure/inference/ch_PP-OCRv3_rec_infer","PaddleOCR/ppstructure/inference/ch_ppstructure_mobile_v2.0_SLANet_infer","PaddleOCR/ppocr/utils/ppocr_keys_v1.txt","PaddleOCR/ppocr/utils/dict/table_structure_dict_ch.txt","PaddleOCR/ppstructure/docs/table/table.jpg","PaddleOCR/output/table")
+print(results)
+
 
 5.Key Information Extraction(KIE) 
+#làm lại thư mục dữ liệu: 1 folder ảnh, 1 file jsonl có n dòng, 1 đối tượng được lưu trong file piclke là 1 list có n phần tử(mỗi phần tử là 1 list(chuỗi tên ảnh, chuỗi nhãn dict)=>sửa lại load data trong file simple_dataset.py
 a.Text detection + text recognition + semantic entity recognition (SER)
 cd PaddleOCR/ppstructure 
 python3 kie/predict_kie_token_ser.py \
   --kie_algorithm=LayoutXLM \
   --ser_model_dir=../../inference/ser_vi_layoutxlm_xfund_infer \
   --image_dir=./docs/kie/input/zh_val_42.jpg \
-  --ser_dict_path=../train_data/XFUND/class_list_xfun.txt \
+  --ser_dict_path=../ppocr/utils/dict/kie_dict/xfund_class_list.txt \
   --vis_font_path=../doc/fonts/simfang.ttf \
   --ocr_order_method="tb-yx"
 
