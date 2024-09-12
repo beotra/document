@@ -61,7 +61,9 @@ print(results)
 
 5.Key Information Extraction(KIE) 
 #làm lại thư mục dữ liệu: 1 folder ảnh, 1 file jsonl có n dòng, 1 đối tượng được lưu trong file piclke là 1 list có n phần tử(mỗi phần tử là 1 list(chuỗi tên ảnh, chuỗi nhãn dict)=>sửa lại load data trong file simple_dataset.py
+
 a.Text detection + text recognition + semantic entity recognition (SER)
+#infer 
 cd PaddleOCR/ppstructure 
 python3 kie/predict_kie_token_ser.py \
   --kie_algorithm=LayoutXLM \
@@ -70,6 +72,22 @@ python3 kie/predict_kie_token_ser.py \
   --ser_dict_path=../ppocr/utils/dict/kie_dict/xfund_class_list.txt \
   --vis_font_path=../doc/fonts/simfang.ttf \
   --ocr_order_method="tb-yx"
+#dùng hàm để gọi
+from PaddleOCR.ppstructure.kie.predict_kie_token_ser import predict_kie_token_ser_function
+image_dir='PaddleOCR/train_data/XFUND/zh_val/image/82092117.png'
+vis_font_path='PaddleOCR/doc/fonts/simfang.ttf'
+ser_model_dir='PaddleOCR/inference/ser_vi_layoutxlm'
+ser_dict_path='PaddleOCR/ppocr/utils/dict/kie_dict/xfund_class_list.txt'
+
+import cv2
+image_file = "PaddleOCR/train_data/XFUND/zh_val/image/82092117.png"
+img = cv2.imread(image_file)
+
+
+ser_res=predict_kie_token_ser_function(image_dir,vis_font_path,ser_model_dir,ser_dict_path,img)
+
+image_dir="PaddleOCR/ppstructure/docs/kie/input/zh_val_42.jpg"
+image_dir="PaddleOCR/ppstructure/docs/kie/input/82092117.png"
 
 b.Text detection + text recognition + semantic entity recognition (SER) + relationship extraction (RE)
 cd PaddleOCR/ppstructure 
